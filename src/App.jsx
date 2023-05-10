@@ -1,20 +1,36 @@
-import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import { generateMidi } from "./helpers/generate-midi";
-import { MidiMe } from "@magenta/music";
-// const MagentaMusic = require("@magenta/music");
+
+const player = new mm.Player();
+const model = new mm.MusicVAE(
+  "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_16bar_small_q2"
+);
+
+async function generateMusicVaeMelody() {
+  let musicVaeMelody;
+
+  async function generate() {
+    await mm.Player.tone.context.resume(); // enable audio
+    await model.sample(1).then((samples) => {
+      musicVaeMelody = samples[0]; // store musicVaeMelody for download
+      player.start(musicVaeMelody);
+    });
+  }
+
+  function download() {
+    if (!musicVaeMelody) {
+      alert("You must generate a musicVaeMelody before you can download it!");
+    } else {
+      saveAs(new File([mm.sequenceProtoToMidi(musicVaeMelody)], "trio.mid"));
+    }
+  }
+
+  await generate();
+  download();
+}
+
 function App() {
-  const [count, setCount] = useState(0);
-
-  // const generateMelody = () => {
-  //   const midime = new MidiMe({ epochs: 100 });
-  //   midime.initialize();
-  //   console.log("midime", midime);
-  //   console.log("midime");
-  // };
-
   return (
     <div className="App">
       <div>
@@ -52,8 +68,9 @@ function App() {
       <button
         className="btn btn-success mt-3"
         dowload="melody"
-        //onClick={generateMelody}
-        onClick={generateMidi}
+        onClick={generateMusicVaeMelody}
+        // onClick={initializeMidiMe}
+        //onClick={generateMidi}
       >
         Generate
       </button>
