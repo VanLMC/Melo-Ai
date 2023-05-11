@@ -1,0 +1,29 @@
+Ui
+
+
+-add toast for error
+-add drag and drop to mix and match composers
+-add loader in generator button
+-add mui
+
+
+
+
+feat
+-add midi for at least 3 artists
+-transpose that midi to the same key then transpose to the selected key
+-add option to generate new midi (no composer influence) with my own algorithm or with ai
+-use the checkpoint that has more bars
+-add svg to make interface look better
+-add visualizer / player for generated midi 
+-key selection option
+
+
+infra
+-clean up the code
+-add .env config for server
+-deploy backend 
+-deploy frontend
+-add eslint
+-add trycatch treatment
+
