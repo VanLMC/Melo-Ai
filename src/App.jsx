@@ -4,6 +4,9 @@ import "./App.css";
 import { MidiMe } from "@magenta/music";
 import { useState } from "react";
 
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+
 const model = new mm.MusicVAE(
   "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_2bar_small"
 );
@@ -118,28 +121,21 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>MELO AI</h1>
+      <Typography variant="h2" color="secondary" fontWeight={"bold"}>
+        Melo AI
+      </Typography>
 
-      <div className="mt-3">
-        <select name="artist" id="artist">
-          <option>None</option>
-          <option>Stevie Wonder</option>
-          <option>Michael Jackson</option>
-          <option>Martin Garrix</option>
-        </select>
-      </div>
-
-      <button
-        className="btn btn-success mt-3"
+      <Button
+        sx={{ marginTop: "20px" }}
+        variant="contained"
+        className=""
         dowload="melody"
         onClick={generateMidiMeMelody}
-        type="button"
         //onClick={generateMusicVaeMelody}
-        // onClick={initializeMidiMe}
-        //onClick={generateMidi}
+        type="button"
       >
         {!loading ? "Generate" : "..."}
-      </button>
+      </Button>
     </div>
   );
 }
