@@ -8,13 +8,14 @@ import {
   Controls,
   Logo,
   PianoCanvasContainer,
+  PianoRollButtonsContainer,
   SvgContainer,
 } from "./styles";
 import animatedPiano from "./assets/animated_piano.svg";
 import DragComposers from "./components/DragComposers";
 import { options, pianoCanvasConfig } from "../constants";
 import { CircularProgress } from "@mui/material";
-import { Pause, PlayArrow } from "@mui/icons-material";
+import { Download, Pause, PlayArrow } from "@mui/icons-material";
 
 const model = new mm.MusicVAE(
   "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_4bar_med_q2"
@@ -135,7 +136,6 @@ function App() {
       pianoCanvasConfig
     );
     setVisualizer(visualizer);
-    //saveAs(new File([mm.sequenceProtoToMidi(midiMeMelody)], "melody.mid"));
 
     setLoading(false);
   }
@@ -168,9 +168,13 @@ function App() {
     player.start(generatedSequence);
   };
 
-  const stopSequence = async () => {
+  const stopSequence = () => {
     setIsPlaying(false);
     player.stop();
+  };
+
+  const downloadSequence = async () => {
+    saveAs(new File([mm.sequenceProtoToMidi(generatedSequence)], "melody.mid"));
   };
 
   return (
@@ -195,24 +199,22 @@ function App() {
         <PianoCanvasContainer show={generatedSequence}>
           <canvas id="canvas" width="500"></canvas>
         </PianoCanvasContainer>
-        {generatedSequence &&
-          (isPLaying ? (
-            <Button
-              sx={{ marginTop: "20px" }}
-              color="secondary"
-              onClick={stopSequence}
-            >
-              <Pause />
+        {generatedSequence && (
+          <PianoRollButtonsContainer>
+            {isPLaying ? (
+              <Button color="secondary" onClick={stopSequence}>
+                <Pause />
+              </Button>
+            ) : (
+              <Button color="secondary" onClick={playSequence}>
+                <PlayArrow />
+              </Button>
+            )}
+            <Button color="secondary" onClick={downloadSequence}>
+              <Download />
             </Button>
-          ) : (
-            <Button
-              sx={{ marginTop: "20px" }}
-              color="secondary"
-              onClick={playSequence}
-            >
-              <PlayArrow />
-            </Button>
-          ))}
+          </PianoRollButtonsContainer>
+        )}
         <Button
           size="large"
           sx={{ marginTop: "20px" }}

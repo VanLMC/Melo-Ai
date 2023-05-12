@@ -10,7 +10,7 @@ export const Container = styled.div`
 
 export const SvgContainer = styled.h1`
   width: 100%;
-  height: 220px;
+  height: 210px;
   position: relative;
   display: flex;
   justify-content: center;
@@ -34,4 +34,9 @@ export const PianoCanvasContainer = styled(Paper)`
   width: 700px;
   margin-top: 20px;
   display: ${(props) => (props.show ? "block" : "none")};
+`;
+
+export const PianoRollButtonsContainer = styled.div`
+  display: flex;
+  margin-top: 20px;
 `;
