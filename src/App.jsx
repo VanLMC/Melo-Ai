@@ -7,6 +7,8 @@ import { Container, Controls, Logo, SvgContainer } from "./styles";
 import animatedPiano from "./assets/animated_piano.svg";
 import DragComposers from "./components/DragComposers";
 import { options } from "../constants";
+import { CircularProgress } from "@mui/material";
+// import CircularProgress from '@mui/material/CircularProgress';
 
 const model = new mm.MusicVAE(
   "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_2bar_small"
@@ -81,12 +83,9 @@ function App() {
 
 
   async function generateMidiMeMelody() {
-    
     setLoading(true);
 
-
     let midiMeMelody;
-    
     const selectedComposers = composers[1];
 
     const fetchMidiPromises = selectedComposers.map(async (composer) => {
@@ -168,7 +167,7 @@ function App() {
           //onClick={generateMusicVaeMelody}
           type="button"
         >
-          {!loading ? "Generate" : "..."}
+          {!loading ? "Generate" :  <CircularProgress color="inherit" />}
         </Button>
       </Controls>
     </Container>
