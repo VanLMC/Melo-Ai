@@ -192,7 +192,7 @@ function App() {
         {generationType === "artists" && (
           <>
             <Typography variant="h6" color="#fff" fontWeight={"bold"} mb={3}>
-              Mix and Match Composers to create a unique melody using AI:
+              Mix and Match Artists to create a unique melody using AI:
             </Typography>
             <DragComposers state={composers} setState={setComposers} />
           </>
