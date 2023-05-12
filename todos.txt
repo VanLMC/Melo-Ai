@@ -16,7 +16,7 @@ feat
 
 -add visualizer / player for generated midi 
 -key selection option
-
+-use correct checkpoint
 
 infra
 -clean up the code

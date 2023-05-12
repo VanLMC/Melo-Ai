@@ -3,8 +3,10 @@ import { MidiMe } from "@magenta/music";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useSpring, animated } from "@react-spring/web";
-import { Container, Logo, SvgContainer } from "./styles";
+import { Container, Controls, Logo, SvgContainer } from "./styles";
 import animatedPiano from "./assets/animated_piano.svg";
+import DragComposers from "./components/DragComposers";
+import { options } from "../constants";
 
 const model = new mm.MusicVAE(
   "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_2bar_small"
@@ -46,8 +48,6 @@ const fetchFileNames = async (artistName) => {
 };
 
 function App() {
-  const [loading, setLoading] = useState(false);
-
   async function generateMidiMeMelody() {
     let midiMeMelody;
     const artistName = "martin-garrix";
@@ -113,15 +113,18 @@ function App() {
   const [props, api] = useSpring(
     () => ({
       config: { duration: 4000 },
-      from: { position: "absolute", top: -30 },
+      from: { position: "absolute", top: -60 },
       to: [
-        { position: "absolute", top: 0 },
         { position: "absolute", top: -30 },
+        { position: "absolute", top: -60 },
       ],
       loop: true,
     }),
     []
   );
+
+  const [selectedComposers, setSelectedComposers] = useState([options, []]);
+  const [loading, setLoading] = useState(false);
 
   return (
     <Container>
@@ -131,20 +134,31 @@ function App() {
 
       <SvgContainer>
         <animated.div style={props}>
-          <Logo src={animatedPiano} className="logo" />
+          <Logo draggable="false" src={animatedPiano} className="logo" />
         </animated.div>
       </SvgContainer>
-      <Button
-        size="large"
-        sx={{ marginTop: "20px" }}
-        variant="contained"
-        dowload="melody"
-        onClick={generateMidiMeMelody}
-        //onClick={generateMusicVaeMelody}
-        type="button"
-      >
-        {!loading ? "Generate" : "..."}
-      </Button>
+
+      <Controls>
+        <Typography variant="h6" color="#fff" fontWeight={"bold"} mb={3}>
+          Mix and Match Composers to create a unique melody using AI:
+        </Typography>
+
+        <DragComposers
+          state={selectedComposers}
+          setState={setSelectedComposers}
+        />
+        <Button
+          size="large"
+          sx={{ marginTop: "20px" }}
+          variant="contained"
+          dowload="melody"
+          onClick={generateMidiMeMelody}
+          //onClick={generateMusicVaeMelody}
+          type="button"
+        >
+          {!loading ? "Generate" : "..."}
+        </Button>
+      </Controls>
     </Container>
   );
 }
