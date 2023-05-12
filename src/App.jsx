@@ -8,14 +8,13 @@ import animatedPiano from "./assets/animated_piano.svg";
 import DragComposers from "./components/DragComposers";
 import { options } from "../constants";
 import { CircularProgress } from "@mui/material";
-// import CircularProgress from '@mui/material/CircularProgress';
 
 const model = new mm.MusicVAE(
-  "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_2bar_small"
+  "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_4bar_med_q2"
 );
-const MELODY_BARS = 2;
+const MELODY_BARS = 4;
 
-const serverUrl = "http://192.168.0.4:8000";
+const serverUrl = "http://192.168.0.4:8000"; 
 
 async function generateMusicVaeMelody() {
   let musicVaeMelody;
@@ -25,7 +24,6 @@ async function generateMusicVaeMelody() {
     await model.initialize().then(async () => {
       await model.sample(1).then((samples) => {
         musicVaeMelody = samples[0];
-        //player.start(musicVaeMelody);
       });
     });
   }
@@ -164,6 +162,7 @@ function App() {
           dowload="melody"
           color="secondary"
           onClick={generateMidiMeMelody}
+          disabled={loading}
           //onClick={generateMusicVaeMelody}
           type="button"
         >
