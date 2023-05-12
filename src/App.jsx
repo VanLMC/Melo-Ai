@@ -48,43 +48,57 @@ const fetchFileNames = async (artistName) => {
 };
 
 function App() {
-  async function generateMidiMeMelody() {
-    let midiMeMelody;
-    const artistName = "martin-garrix";
+  const [composers, setComposers] = useState([options, []]);
+  const [loading, setLoading] = useState(false);
 
+  
+  function loadMidi(fileNames, artistName) {
+    const promises = [];
+
+    fileNames.forEach((fileName) => {
+      const fileUrl = `${serverUrl}/midi-files/${artistName}/${fileName}`;
+      const promise = mm.urlToBlob(fileUrl).then(async (blob) => {
+        return await mm.blobToNoteSequence(blob);
+      });
+      promises.push(promise);
+    });
+
+    return Promise.all(promises).then((res) => res);
+  }
+
+  
+  function getChunks(quantizedMels) {
+    let chunks = [];
+    quantizedMels.forEach((m) => {
+      const melChunks = mm.sequences.split(
+        mm.sequences.clone(m),
+        16 * MELODY_BARS
+      );
+      chunks = chunks.concat(melChunks);
+    });
+    return chunks;
+  }
+
+
+  async function generateMidiMeMelody() {
+    
     setLoading(true);
 
-    function getChunks(quantizedMels) {
-      let chunks = [];
-      quantizedMels.forEach((m) => {
-        const melChunks = mm.sequences.split(
-          mm.sequences.clone(m),
-          16 * MELODY_BARS
-        );
-        chunks = chunks.concat(melChunks);
-      });
-      return chunks;
-    }
 
-    function loadMidi(fileNames, artistName) {
-      const promises = [];
+    let midiMeMelody;
+    
+    const selectedComposers = composers[1];
 
-      fileNames.forEach((fileName) => {
-        const fileUrl = `${serverUrl}/midi-files/${artistName}/${fileName}`;
-        const promise = mm.urlToBlob(fileUrl).then(async (blob) => {
-          return await mm.blobToNoteSequence(blob);
-        });
-        promises.push(promise);
-      });
+    const fetchMidiPromises = selectedComposers.map(async (composer) => {
+      const fileNames = await fetchFileNames(composer.id);
+      const midisequencesFromServer = await loadMidi(fileNames, composer.id);
+      return midisequencesFromServer;
+    });
+    const midiSequencesResponse =  await Promise.all(fetchMidiPromises).then((res) => res);
 
-      return Promise.all(promises).then((res) => res);
-    }
+    const midiSequences = midiSequencesResponse.flat();
 
-    const fileNames = await fetchFileNames(artistName);
-
-    const midisequencesFromServer = await loadMidi(fileNames, artistName);
-
-    const quantizedSequences = midisequencesFromServer.map((sequence) =>
+    const quantizedSequences = midiSequences.map((sequence) =>
       mm.sequences.quantizeNoteSequence(sequence, 4)
     );
 
@@ -100,7 +114,6 @@ function App() {
     });
 
     const s = await midime.sample(1);
-    const zArray = s.arraySync()[0];
     midiMeMelody = (await model.decode(s))[0];
 
     if (!midiMeMelody) return;
@@ -123,8 +136,6 @@ function App() {
     []
   );
 
-  const [selectedComposers, setSelectedComposers] = useState([options, []]);
-  const [loading, setLoading] = useState(false);
 
   return (
     <Container>
@@ -144,14 +155,15 @@ function App() {
         </Typography>
 
         <DragComposers
-          state={selectedComposers}
-          setState={setSelectedComposers}
+          state={composers}
+          setState={setComposers}
         />
         <Button
           size="large"
           sx={{ marginTop: "20px" }}
           variant="contained"
           dowload="melody"
+          color="secondary"
           onClick={generateMidiMeMelody}
           //onClick={generateMusicVaeMelody}
           type="button"
