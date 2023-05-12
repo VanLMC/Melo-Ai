@@ -1,12 +1,18 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { MidiMe } from "@magenta/music";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useSpring, animated } from "@react-spring/web";
-import { Container, Controls, Logo, SvgContainer } from "./styles";
+import {
+  Container,
+  Controls,
+  Logo,
+  PianoCanvasContainer,
+  SvgContainer,
+} from "./styles";
 import animatedPiano from "./assets/animated_piano.svg";
 import DragComposers from "./components/DragComposers";
-import { options } from "../constants";
+import { options, pianoCanvasConfig } from "../constants";
 import { CircularProgress } from "@mui/material";
 
 const model = new mm.MusicVAE(
@@ -14,7 +20,7 @@ const model = new mm.MusicVAE(
 );
 const MELODY_BARS = 4;
 
-const serverUrl = "http://192.168.0.4:8000"; 
+const serverUrl = "http://192.168.0.4:8000";
 
 async function generateMusicVaeMelody() {
   let musicVaeMelody;
@@ -50,8 +56,8 @@ const fetchFileNames = async (artistName) => {
 function App() {
   const [composers, setComposers] = useState([options, []]);
   const [loading, setLoading] = useState(false);
+  const [generatedSequence, setGeneratedSequence] = useState(null);
 
-  
   function loadMidi(fileNames, artistName) {
     const promises = [];
 
@@ -66,7 +72,6 @@ function App() {
     return Promise.all(promises).then((res) => res);
   }
 
-  
   function getChunks(quantizedMels) {
     let chunks = [];
     quantizedMels.forEach((m) => {
@@ -79,7 +84,6 @@ function App() {
     return chunks;
   }
 
-
   async function generateMidiMeMelody() {
     setLoading(true);
 
@@ -91,7 +95,9 @@ function App() {
       const midisequencesFromServer = await loadMidi(fileNames, composer.id);
       return midisequencesFromServer;
     });
-    const midiSequencesResponse =  await Promise.all(fetchMidiPromises).then((res) => res);
+    const midiSequencesResponse = await Promise.all(fetchMidiPromises).then(
+      (res) => res
+    );
 
     const midiSequences = midiSequencesResponse.flat();
 
@@ -115,6 +121,14 @@ function App() {
 
     if (!midiMeMelody) return;
     midiMeMelody.notes.forEach((note) => (note.velocity = 100));
+
+    setGeneratedSequence(midiMeMelody);
+
+    new mm.PianoRollCanvasVisualizer(
+      midiMeMelody,
+      document.getElementById("canvas"),
+      pianoCanvasConfig
+    );
     saveAs(new File([mm.sequenceProtoToMidi(midiMeMelody)], "melody.mid"));
 
     setLoading(false);
@@ -133,7 +147,7 @@ function App() {
     []
   );
 
-
+  const visualizerRef = useRef(null);
   return (
     <Container>
       <Typography variant="h2" color="secondary" fontWeight={"bold"}>
@@ -151,10 +165,12 @@ function App() {
           Mix and Match Composers to create a unique melody using AI:
         </Typography>
 
-        <DragComposers
-          state={composers}
-          setState={setComposers}
-        />
+        <DragComposers state={composers} setState={setComposers} />
+
+        <PianoCanvasContainer show={generatedSequence}>
+          <canvas id="canvas" width="500"></canvas>
+        </PianoCanvasContainer>
+
         <Button
           size="large"
           sx={{ marginTop: "20px" }}
@@ -166,7 +182,7 @@ function App() {
           //onClick={generateMusicVaeMelody}
           type="button"
         >
-          {!loading ? "Generate" :  <CircularProgress color="inherit" />}
+          {!loading ? "Generate" : <CircularProgress color="inherit" />}
         </Button>
       </Controls>
     </Container>

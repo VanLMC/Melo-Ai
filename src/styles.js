@@ -1,3 +1,4 @@
+import { Paper } from "@mui/material";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -26,4 +27,11 @@ export const Controls = styled.div`
   align-items: center;
   margin: 0 auto;
   width: 600px;
+`;
+
+export const PianoCanvasContainer = styled(Paper)`
+  padding: 20px;
+  width: 700px;
+  margin-top: 20px;
+  display: ${(props) => (props.show ? "block" : "none")};
 `;
