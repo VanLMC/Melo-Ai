@@ -220,7 +220,7 @@ function App() {
           dowload="melody"
           color="secondary"
           onClick={generateMidiMeMelody}
-          disabled={loading}
+          disabled={loading || composers[1].length === 0}
           //onClick={generateMusicVaeMelody}
           type="button"
         >
