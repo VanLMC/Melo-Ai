@@ -19,6 +19,7 @@ import { Download, Pause, PlayArrow } from "@mui/icons-material";
 import { getChunks } from "./helpers/quantize-melodies";
 import { loadMidi } from "./helpers/load-midi";
 import GenerationTypeSelector from "./components/GenerationTypeSelector";
+import { generateMidiWithRandomNumbers } from "./helpers/generate-with-numbers";
 
 const MELODY_BARS = 4;
 const CHECKPOINT =
@@ -92,7 +93,7 @@ function App() {
       midime.initialize();
 
       await midime.train(z, async (epoch, logs) => {
-        console.log("epoch + 1", epoch + 1);
+        console.log("epoch", epoch + 1);
         console.log("plot loss", logs.total);
       });
 
@@ -129,6 +130,20 @@ function App() {
     }
   }
 
+  async function generateWithRandomNumbers() {
+    try {
+      setLoading(true);
+      const midi = generateMidiWithRandomNumbers();
+      const sequence = await mm.midiToSequenceProto(midi);
+      setGeneratedSequence(sequence);
+      setupVisualizer(sequence);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const setupVisualizer = (generatedMelodyeMelody) => {
     const visualizer = new mm.PianoRollCanvasVisualizer(
       generatedMelodyeMelody,
@@ -150,6 +165,12 @@ function App() {
 
   const downloadSequence = async () => {
     saveAs(new File([mm.sequenceProtoToMidi(generatedSequence)], "melody.mid"));
+  };
+
+  const generateFunction = {
+    ["artists"]: generateMidiMeMelody,
+    ["pure-ai"]: generateMusicVaeMelody,
+    ["algorithm"]: generateWithRandomNumbers,
   };
 
   return (
@@ -218,11 +239,7 @@ function App() {
             loading ||
             (generationType === "artists" && composers[1].length === 0)
           }
-          onClick={
-            generationType === "artists"
-              ? generateMidiMeMelody
-              : generateMusicVaeMelody
-          }
+          onClick={generateFunction[generationType]}
           type="button"
         >
           {!loading ? "Generate" : <CircularProgress color="inherit" />}

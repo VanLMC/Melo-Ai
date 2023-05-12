@@ -1,6 +1,8 @@
 export const options = [
   { id: "zedd", content: "Zedd" },
   { id: "martin-garrix", content: "Martin Garrix" },
+  { id: "michael-jackson", content: "Michael Jackson" },
+  { id: "stevie-wonder", content: "Stevie Wonder" },
 ];
 
 export const pianoCanvasConfig = {

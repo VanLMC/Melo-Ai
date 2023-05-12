@@ -20,15 +20,21 @@ export default function GemerationTypeSelector({
       >
         <div>
           <Typography variant="caption" color="#fff" fontWeight={"bold"} mb={3}>
-            Based on existing artists
+            Existing artists
           </Typography>
           <Radio value="artists" />
         </div>
         <div>
           <Typography variant="caption" color="#fff" fontWeight={"bold"} mb={3}>
-            Based on pure AI model
+            Pure AI model
           </Typography>
           <Radio value="pure-ai" />
+        </div>
+        <div>
+          <Typography variant="caption" color="#fff" fontWeight={"bold"} mb={3}>
+            Algorithm
+          </Typography>
+          <Radio value="algorithm" />
         </div>
       </RadioGroup>
     </div>
