@@ -18,35 +18,11 @@ import { CircularProgress } from "@mui/material";
 import { Download, Pause, PlayArrow } from "@mui/icons-material";
 import { getChunks } from "./helpers/quantize-melodies";
 import { loadMidi } from "./helpers/load-midi";
+import GenerationTypeSelector from "./components/GenerationTypeSelector";
 
 const MELODY_BARS = 4;
 const CHECKPOINT =
   "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_4bar_med_q2";
-
-async function generateMusicVaeMelody() {
-  let musicVaeMelody;
-
-  async function generate() {
-    await mm.Player.tone.context.resume(); // enable audio
-    await musicVae.initialize().then(async () => {
-      await musicVae.sample(1).then((samples) => {
-        musicVaeMelody = samples[0];
-      });
-    });
-  }
-
-  function download() {
-    if (!musicVaeMelody) {
-      alert("You must generate a musicVaeMelody before you can download it!");
-    } else {
-      musicVaeMelody.notes.forEach((note) => (note.velocity = 100));
-      saveAs(new File([mm.sequenceProtoToMidi(musicVaeMelody)], "melody.mid"));
-    }
-  }
-
-  await generate();
-  download();
-}
 
 const fetchFileNames = async (artistName) => {
   return await fetch(`${SERVER_URL}/midi-files/${artistName}`)
@@ -60,6 +36,7 @@ function App() {
   const [generatedSequence, setGeneratedSequence] = useState(null);
   const [isPLaying, setIsPlaying] = useState(false);
   const [visualizer, setVisualizer] = useState(null);
+  const [generationType, setGenerationType] = useState("artists");
 
   const musicVae = useMemo(() => new mm.MusicVAE(CHECKPOINT), []);
 
@@ -134,6 +111,24 @@ function App() {
     }
   }
 
+  async function generateMusicVaeMelody() {
+    try {
+      setLoading(true);
+
+      await musicVae.initialize().then(async () => {
+        await musicVae.sample(1).then((samples) => {
+          const generatedMelodyeMelody = samples[0];
+          setGeneratedSequence(generatedMelodyeMelody);
+          setupVisualizer(generatedMelodyeMelody);
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const setupVisualizer = (generatedMelodyeMelody) => {
     const visualizer = new mm.PianoRollCanvasVisualizer(
       generatedMelodyeMelody,
@@ -168,13 +163,19 @@ function App() {
           <Logo draggable="false" src={animatedPiano} className="logo" />
         </animated.div>
       </SvgContainer>
-
+      <GenerationTypeSelector
+        generationType={generationType}
+        setGenerationType={setGenerationType}
+      />
       <Controls>
-        <Typography variant="h6" color="#fff" fontWeight={"bold"} mb={3}>
-          Mix and Match Composers to create a unique melody using AI:
-        </Typography>
-
-        <DragComposers state={composers} setState={setComposers} />
+        {generationType === "artists" && (
+          <>
+            <Typography variant="h6" color="#fff" fontWeight={"bold"} mb={3}>
+              Mix and Match Composers to create a unique melody using AI:
+            </Typography>
+            <DragComposers state={composers} setState={setComposers} />
+          </>
+        )}
 
         <PianoCanvasContainer show={generatedSequence}>
           <canvas id="canvas" width="500"></canvas>
@@ -213,9 +214,15 @@ function App() {
           variant="contained"
           dowload="melody"
           color="secondary"
-          onClick={generateMidiMeMelody}
-          disabled={loading || composers[1].length === 0}
-          //onClick={generateMusicVaeMelody}
+          disabled={
+            loading ||
+            (generationType === "artists" && composers[1].length === 0)
+          }
+          onClick={
+            generationType === "artists"
+              ? generateMidiMeMelody
+              : generateMusicVaeMelody
+          }
           type="button"
         >
           {!loading ? "Generate" : <CircularProgress color="inherit" />}
