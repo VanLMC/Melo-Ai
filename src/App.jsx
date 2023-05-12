@@ -1,11 +1,10 @@
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
-import { MidiMe } from "@magenta/music";
 import { useState } from "react";
-
+import { MidiMe } from "@magenta/music";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { useSpring, animated } from "@react-spring/web";
+import { Container, Logo, SvgContainer } from "./styles";
+import animatedPiano from "./assets/animated_piano.svg";
 
 const model = new mm.MusicVAE(
   "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_2bar_small"
@@ -26,7 +25,7 @@ async function generateMusicVaeMelody() {
       });
     });
   }
-  console.log(musicVaeMelody);
+
   function download() {
     if (!musicVaeMelody) {
       alert("You must generate a musicVaeMelody before you can download it!");
@@ -111,24 +110,34 @@ function App() {
     setLoading(false);
   }
 
+  const [props, api] = useSpring(
+    () => ({
+      config: { duration: 4000 },
+      from: { position: "absolute", top: -30 },
+      to: [
+        { position: "absolute", top: 0 },
+        { position: "absolute", top: -30 },
+      ],
+      loop: true,
+    }),
+    []
+  );
+
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
+    <Container>
       <Typography variant="h2" color="secondary" fontWeight={"bold"}>
         Melo AI
       </Typography>
 
+      <SvgContainer>
+        <animated.div style={props}>
+          <Logo src={animatedPiano} className="logo" />
+        </animated.div>
+      </SvgContainer>
       <Button
+        size="large"
         sx={{ marginTop: "20px" }}
         variant="contained"
-        className=""
         dowload="melody"
         onClick={generateMidiMeMelody}
         //onClick={generateMusicVaeMelody}
@@ -136,7 +145,7 @@ function App() {
       >
         {!loading ? "Generate" : "..."}
       </Button>
-    </div>
+    </Container>
   );
 }
 
