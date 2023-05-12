@@ -2,7 +2,7 @@ Ui
 
 
 -add toast for error
--add drag and drop to mix and match composers
+-add drag and drop to mix and match composers ok
 -add loader in generator button ok
 -add mui ok
 -add svg to make interface look better ok

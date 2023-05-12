@@ -80,7 +80,7 @@ export default function DragComposers({ state, setState }) {
           Options
         </Typography>
         <Typography variant="caption" color="#fff" fontWeight={"bold"}>
-          Selected Composers:
+          Selected Artists:
         </Typography>
       </Labels>
       <div style={{ display: "flex" }}>

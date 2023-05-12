@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { MidiMe } from "@magenta/music";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -14,10 +14,12 @@ import animatedPiano from "./assets/animated_piano.svg";
 import DragComposers from "./components/DragComposers";
 import { options, pianoCanvasConfig } from "../constants";
 import { CircularProgress } from "@mui/material";
+import { Pause, PlayArrow } from "@mui/icons-material";
 
 const model = new mm.MusicVAE(
   "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_4bar_med_q2"
 );
+
 const MELODY_BARS = 4;
 
 const serverUrl = "http://192.168.0.4:8000";
@@ -57,6 +59,9 @@ function App() {
   const [composers, setComposers] = useState([options, []]);
   const [loading, setLoading] = useState(false);
   const [generatedSequence, setGeneratedSequence] = useState(null);
+  const [isPLaying, setIsPlaying] = useState(false);
+
+  const [visualizer, setVisualizer] = useState(null);
 
   function loadMidi(fileNames, artistName) {
     const promises = [];
@@ -124,12 +129,13 @@ function App() {
 
     setGeneratedSequence(midiMeMelody);
 
-    new mm.PianoRollCanvasVisualizer(
+    const visualizer = new mm.PianoRollCanvasVisualizer(
       midiMeMelody,
       document.getElementById("canvas"),
       pianoCanvasConfig
     );
-    saveAs(new File([mm.sequenceProtoToMidi(midiMeMelody)], "melody.mid"));
+    setVisualizer(visualizer);
+    //saveAs(new File([mm.sequenceProtoToMidi(midiMeMelody)], "melody.mid"));
 
     setLoading(false);
   }
@@ -147,7 +153,26 @@ function App() {
     []
   );
 
-  const visualizerRef = useRef(null);
+  const player = useMemo(
+    () =>
+      new mm.Player(false, {
+        run: (note) => visualizer.redraw(note),
+        stop: () => {
+          setIsPlaying(false);
+        },
+      }),
+    [visualizer]
+  );
+  const playSequence = () => {
+    setIsPlaying(true);
+    player.start(generatedSequence);
+  };
+
+  const stopSequence = async () => {
+    setIsPlaying(false);
+    player.stop();
+  };
+
   return (
     <Container>
       <Typography variant="h2" color="secondary" fontWeight={"bold"}>
@@ -170,7 +195,24 @@ function App() {
         <PianoCanvasContainer show={generatedSequence}>
           <canvas id="canvas" width="500"></canvas>
         </PianoCanvasContainer>
-
+        {generatedSequence &&
+          (isPLaying ? (
+            <Button
+              sx={{ marginTop: "20px" }}
+              color="secondary"
+              onClick={stopSequence}
+            >
+              <Pause />
+            </Button>
+          ) : (
+            <Button
+              sx={{ marginTop: "20px" }}
+              color="secondary"
+              onClick={playSequence}
+            >
+              <PlayArrow />
+            </Button>
+          ))}
         <Button
           size="large"
           sx={{ marginTop: "20px" }}
