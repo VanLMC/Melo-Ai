@@ -9,7 +9,7 @@
 -Escute e visualize no navegador 
 -Exporte o arquivo midi para importar em seu DAW
 
-![chrome-capture-2023-4-12](https://github.com/VanLMC/Melo-Ai/assets/39391737/286d71dd-28d2-45c1-9f1f-dd9bed27525b)
+![chrome-capture-2023-4-12](https://github.com/VanLMC/Melo-Ai/assets/39391737/5a851f19-5de9-4697-9ba8-4d78f180f040)
 
 ---
 
