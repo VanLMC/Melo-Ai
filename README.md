@@ -2,7 +2,7 @@
 📄<br>Melo Ai
 </h1>
 
-> Melo AI utiliza inteligência artificial e algoritmos.
+> Melo AI utiliza inteligência artificial e algoritmos. \
 -Combine o estilo de diferentes artistas para gerar melodias únicas \
 -Gere melodias do zero usando o modelo da musicVae \
 -Gere melodias utilizando o algoritmo \
@@ -18,6 +18,9 @@
 ## Rodar o projeto
   -yarn install \
   -yarn dev \
+  
+  
+  
 Você pode ver o projeto rodando [aqui](https://melo-ai.onrender.com/) 
 
 
