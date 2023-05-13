@@ -13,7 +13,7 @@
 
 ---
 
-> Rodar o projeto
+## Rodar o projeto
   -yarn install \
   -yarn dev \
 Você pode ver o projeto rodando [aqui](google.com) 
