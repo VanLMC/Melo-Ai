@@ -1,10 +1,8 @@
-import { SERVER_URL } from "../../constants";
-
 export function loadMidi(fileNames, artistName) {
+  const serverURl = import.meta.env.VITE_SERVER_URL;
   const promises = [];
-
   fileNames.forEach((fileName) => {
-    const fileUrl = `${SERVER_URL}/midi-files/${artistName}/${fileName}`;
+    const fileUrl = `${serverURl}/midi-files/${artistName}/${fileName}`;
     const promise = mm.urlToBlob(fileUrl).then(async (blob) => {
       return await mm.blobToNoteSequence(blob);
     });

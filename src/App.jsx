@@ -13,7 +13,7 @@ import {
 } from "./styles";
 import animatedPiano from "./assets/animated_piano.svg";
 import DragComposers from "./components/DragComposers";
-import { SERVER_URL, options, pianoCanvasConfig } from "../constants";
+import { options, pianoCanvasConfig } from "../constants";
 import { CircularProgress } from "@mui/material";
 import { Download, Pause, PlayArrow } from "@mui/icons-material";
 import { getChunks } from "./helpers/quantize-melodies";
@@ -25,8 +25,10 @@ const MELODY_BARS = 4;
 const CHECKPOINT =
   "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_4bar_med_q2";
 
+const serverURl = import.meta.env.VITE_SERVER_URL;
+
 const fetchFileNames = async (artistName) => {
-  return await fetch(`${SERVER_URL}/midi-files/${artistName}`)
+  return await fetch(`${serverURl}/midi-files/${artistName}`)
     .then((res) => res.json())
     .then((res) => res.files);
 };

@@ -1,8 +1,1 @@
 
-infra
-
--add .env config for server
--deploy backend 
--deploy frontend
--add eslint
-

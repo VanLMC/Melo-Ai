@@ -12,5 +12,3 @@ export const pianoCanvasConfig = {
   noteRGB: "204, 146, 217",
   activeNoteRGB: "240, 178, 255",
 };
-
-export const SERVER_URL = "http://192.168.0.4:8000";
