@@ -18,7 +18,7 @@
 ## Rodar o projeto
   -yarn install \
   -yarn dev \
-Você pode ver o projeto rodando [aqui]([google.com](https://melo-ai.onrender.com/)) 
+Você pode ver o projeto rodando [aqui](https://melo-ai.onrender.com/) 
 
 
 
