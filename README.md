@@ -14,9 +14,9 @@
 ---
 
 ## Rodar localmente
-  -yarn install
-  -yarn dev
+  -yarn install \
+  -yarn dev \
+Você pode ver o projeto rodando [aqui](google.com) \
 
-## Recursos para o Readme
 
-Você pode ver o projeto rodando [aqui](google.com)
+
