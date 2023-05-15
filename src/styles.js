@@ -6,6 +6,7 @@ export const Container = styled.div`
   width: 1200px;
   padding-top: 50px;
   margin: 0 auto;
+  height: 100vh;
 `;
 
 export const SvgContainer = styled.h1`
