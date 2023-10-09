@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { MidiMe } from "@magenta/music";
+import { MidiMe, MusicVAE } from "@magenta/music";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useSpring, animated } from "@react-spring/web";
@@ -14,7 +14,7 @@ import {
 import animatedPiano from "./assets/animated_piano.svg";
 import DragComposers from "./components/DragComposers";
 import { options, pianoCanvasConfig } from "../constants";
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress, LinearProgress } from "@mui/material";
 import { Download, Pause, PlayArrow } from "@mui/icons-material";
 import { getChunks } from "./helpers/quantize-melodies";
 import { loadMidi } from "./helpers/load-midi";
@@ -40,8 +40,9 @@ function App() {
   const [isPLaying, setIsPlaying] = useState(false);
   const [visualizer, setVisualizer] = useState(null);
   const [generationType, setGenerationType] = useState("artists");
+  const [progress, setProgress] = useState(0);
 
-  const musicVae = useMemo(() => new mm.MusicVAE(CHECKPOINT), []);
+  const musicVae = useMemo(() => new MusicVAE(CHECKPOINT), []);
 
   const [props, _] = useSpring(
     () => ({
@@ -70,7 +71,7 @@ function App() {
   async function generateMidiMeMelody() {
     try {
       setLoading(true);
-
+      setProgress(1);
       const selectedComposers = composers[1];
 
       const fetchMidiPromises = selectedComposers.map(async (composer) => {
@@ -95,6 +96,7 @@ function App() {
       midime.initialize();
 
       await midime.train(z, async (epoch, logs) => {
+        setProgress(epoch + 1);
         console.log("epoch", epoch + 1);
         console.log("plot loss", logs.total);
       });
@@ -110,6 +112,7 @@ function App() {
     } catch (error) {
       console.log(error);
     } finally {
+      setProgress(0);
       setLoading(false);
     }
   }
@@ -117,9 +120,12 @@ function App() {
   async function generateMusicVaeMelody() {
     try {
       setLoading(true);
+      // const controlArgs = {
+      //     key: 0,
 
+      //   };
       await musicVae.initialize().then(async () => {
-        await musicVae.sample(1).then((samples) => {
+        await musicVae.sample(1, 0.5).then((samples) => {
           const generatedMelodyeMelody = samples[0];
           setGeneratedSequence(generatedMelodyeMelody);
           setupVisualizer(generatedMelodyeMelody);
@@ -186,10 +192,12 @@ function App() {
           <Logo draggable="false" src={animatedPiano} className="logo" />
         </animated.div>
       </SvgContainer>
+
       <GenerationTypeSelector
         generationType={generationType}
         setGenerationType={setGenerationType}
       />
+
       <Controls>
         {generationType === "artists" && (
           <>
@@ -230,6 +238,16 @@ function App() {
               <Download />
             </Button>
           </PianoRollButtonsContainer>
+        )}
+        {loading && progress !== 0 && (
+          <Box sx={{ width: "600px", marginTop: 3 }}>
+            <LinearProgress
+              variant="determinate"
+              value={progress}
+              color="secondary"
+              sx={{ height: 5 }}
+            />
+          </Box>
         )}
         <Button
           size="large"
